@@ -1,0 +1,150 @@
+if-then-else expressiona
+
+case expressions
+
+Conditionals and case expressions serve a similar purpose; 
+they both allow a function’s behavior to vary depending on 
+the value of an expression. However, case expressions have 
+some flexibility that if expressions do not have, namely 
+allowing behavior to branch on values other than booleans.
+
+1.1 Conditionals
+
+```
+function x y = if (x > y) then (x + 10) else y
+```
+
+1.2 Reading type signatures
+
+```
+function :: (Ord p, Num p) => p -> p -> p
+```
+
+p must be the same type
+
+before the => (fat arrow) type constraints, p must have an instace of Ord and Num
+
+Ord is a typeclass that provides ordering operations, 
+such as >, for orderable types, such as numbers and characters.
+
+Num is a numeric typeclass (one of many) that provides operations 
+such as + for types of numbers (Integer, Int, Float, and so on).
+
+
+1.3 Branching patterns
+
+two paths, when true first path
+when false second path
+
+1.4 Case expressions
+
+case is a keyword in Haskell and must always be paired with 
+the keyword of
+
+```
+*Main> :info Bool
+data Bool = False | True
+```
+
+The Bool type has only two values (also called its constructors), False and True
+
+1.5 Sum types
+
+```
+*Main> :info Maybe
+data Maybe a = Nothing | Just a
+```
+
+Pipe ("or")
+
+Maybe a is either Nothing or Just a, never both
+
+Datatypes like this, having more than one constructor, are called sum types
+
+ Maybe is a parameterized type, also called a type constructor.
+
+ 1.6 Exercises
+
+Exercise 1 – Absolute value The following is an implementation 
+of a function for producing the absolute value of a number, 
+written with an if-then-else expression. 
+
+Rewrite it with case expression syntax.
+
+```
+absVal :: (Num a, Ord a) => a -> a
+absVal x = if (x < 0) then (negate x) else x
+
+absVal2 :: (Num a, Ord a) => a -> a
+absVal2 x =
+  case (x < 0) of
+    True   -> negate x
+    False  -> x
+```
+
+Exercise 2 – (Bool, Bool) The following validation function 
+branches on two conditions, giving four possible results. 
+Rewrite it as a single case expression over (null username, null password).
+
+```
+validateUsernamePassword :: String -> String -> String
+validateUsernamePassword username password =
+  if null username
+     then (if null password
+             then "Empty username and password"
+             else "Empty username") 
+      else (if null password
+              then "Empty password" else "Okay")
+
+myValidateUsernamePassword :: String -> String -> String
+myValidateUsernamePassword username password =
+  case  (null username, null password) of
+    (True, False)  -> "Empty username"
+    (False, True)  -> "Empty password"
+    (True, True)   -> "Empty username and password"
+    (False, False) -> "Okay"  
+```
+
+Exercise 3 – A question of types In the standard Prelude, 
+the head and tail list functions – for returning just the 
+first element of a list or everything but the first element 
+of a list, respectively – are unsafe: they throw exceptions on
+ empty lists. Here we give an implementation of the tail function 
+ that does not:
+
+ ```
+  tail' :: [a] -> [a]
+  tail' [] = []
+  tail' (x:xs) = xs
+```
+
+Note the syntax in the third line, (x:xs). This deconstructs the 
+list into two pieces, the head x and the tail xs. Having 
+deconstructed it with this pattern, we can return just the part that we want. 
+Later we’ll use this syntax again to check each element of a list, recursively.
+Consider the head function next. In the tail function above, 
+we were able to avoid throwing an exception on an empty list by returning 
+an empty list instead. But the following will not compile.
+
+```
+  head' :: [a] -> a
+  head' [] = []
+  head' (x:xs) = x
+```
+
+Why doesn’t it work?
+
+Type signature expects type a (or char)
+
+Exercise 4 – Maybe for safety Write new, safe versions of head and tail
+that return Maybe values, using Nothing for the empty list cases. 
+
+```
+tail' :: [a] -> Maybe [a]
+tail' []  = Nothing
+tail' [a] = Just [a]
+
+head' :: [a] -> Maybe a
+head' []  = Nothing
+head' [a] = Just a
+```
